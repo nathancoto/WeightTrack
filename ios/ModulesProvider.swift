@@ -6,3 +6,7 @@
 //
 
 import Foundation
+
+public class ModulesProvider : NSObject{
+  public var foo = "Hello from Swift";
+}

@@ -2,6 +2,7 @@
   "expo": {
     "name": "TrackWeights",
     "slug": "TrackWeights",
+    "privacy": "unlisted",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -9,7 +10,7 @@
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#3D348B"
     },
     "updates": {
       "fallbackToCacheTimeout": 0
@@ -18,16 +19,26 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "TrackWeight"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#FFFFFF"
-      }
+        "backgroundColor": "#3D348B"
+      },
+      "package": "com.mrld_evoo.TrackWeights"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "packagerOpts": {
+      "config": "metro.config.js"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "609b11d2-a2d0-44ab-95bd-c66561b2660b"
+      }
     }
   }
 }
