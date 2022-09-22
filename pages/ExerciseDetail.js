@@ -52,6 +52,7 @@ export default class ExerciseDetail extends Component {
             exercise: props.route.params.exercise,
             data: [],
             nbSeries: '',
+            comments: '',
             repsWeights: [],
             date: formattedToday,
             chartData: [],
@@ -84,6 +85,12 @@ export default class ExerciseDetail extends Component {
     onChangeNbSeries = (text) => {
         this.setState({
             nbSeries: text.replace(/[^0-9]/g, ''),
+        });
+    }
+
+    onChangeComments = (text) => {
+        this.setState({
+            comments: text,
         });
     }
 
@@ -240,7 +247,8 @@ export default class ExerciseDetail extends Component {
                             mail: scope.state.exercise.mail,
                             nbSeries: scope.state.nbSeries,
                             repsWeights: scope.state.repsWeights,
-                            date: scope.state.date
+                            date: scope.state.date,
+                            comments: scope.state.comments
                         }
                     ).then(() => {
                         scope.state.ref.current?.close();
@@ -248,6 +256,7 @@ export default class ExerciseDetail extends Component {
                             repsWeights: [],
                             fill: false,
                             nbSeries: '',
+                            comments: '',
                             missingField: false,
                             existingDate: false,
                             wrongFormat: false
@@ -261,13 +270,15 @@ export default class ExerciseDetail extends Component {
                     mail: this.state.exercise.mail,
                     nbSeries: this.state.nbSeries,
                     repsWeights: this.state.repsWeights,
-                    date: this.state.date
+                    date: this.state.date,
+                    comments: this.state.comments
                 }).then(() => {
                     this.state.ref.current?.close();
                     this.setState({
                         repsWeights: [],
                         fill: false,
                         nbSeries: '',
+                        comments: '',
                         missingField: false,
                         existingDate: false,
                         wrongFormat: false
@@ -316,7 +327,8 @@ export default class ExerciseDetail extends Component {
             fill: true,
             nbSeries: dayData.nbSeries,
             repsWeights: dayData.repsWeights,
-            date: dayData.date
+            date: dayData.date,
+            comments: dayData.comments
         });
         this.onOpen();
     }
@@ -412,7 +424,7 @@ export default class ExerciseDetail extends Component {
                     })}
                     renderItem={item => this.renderDateFlatlist(item)}
                     keyExtractor={(item, index) => index}
-                    style={{marginVertical: 20, flexGrow: 0}}
+                    style={{marginVertical: 20, flexGrow: 0, width: G.wSC, paddingHorizontal: 5/100 * G.wSC}}
                 />
 
                 <ScrollView style={{width: '100%'}}>
@@ -461,7 +473,8 @@ export default class ExerciseDetail extends Component {
                             repsWeights: [],
                             fill: false,
                             nbSeries: '',
-                            date: formattedToday
+                            date: formattedToday,
+                            comments: ''
                         });
                     }}
                     modalStyle={{backgroundColor: bgColor}}>
@@ -522,16 +535,16 @@ export default class ExerciseDetail extends Component {
                                             <TouchableOpacity
                                                 style={styles.customInputContainer}
                                                 onPress={() => { this.state.timeInput[i].focus(); }}>
-                                                <TimeIcon style={{color: blueColor}} height={12} />
+                                                <TimeIcon style={{color: 'white'}} height={12} />
                                                 <TextInput
-                                                    style={[styles.customInput, {color: blueColor}]}
+                                                    style={[styles.customInput, {color: 'white'}]}
                                                     keyboardType={'decimal-pad'}
                                                     ref={(input) => { this.state.timeInput[i] = input; }}
                                                     defaultValue={this.state.fill == true ? this.state.dayData.repsWeights[i].recupTime : "0"}
         
                                                     // Events
                                                     onChangeText = {this.onChangeRecupTime({i})}/>
-                                                <Text style={{color: blueColor}}> secondes</Text>
+                                                <Text style={{color: 'white'}}> secondes</Text>
                                              </TouchableOpacity>   
                                             : null
                                         }
@@ -539,6 +552,17 @@ export default class ExerciseDetail extends Component {
                                 )
                             })
                         }
+
+                        <Text style={[styles.dataLabel, {alignSelf: 'flex-start', marginLeft: '10%'}]}>Commentaires</Text>
+                        <TextInput
+                            style={[styles.modalInput, {marginBottom: 20, textAlignVertical: "top"}]}
+                            placeholder="Commentaires"
+                            placeholderTextColor={'#96C9DC'}
+                            defaultValue={this.state.fill == true ? this.state.dayData.comments : null}
+                            multiline={true}
+
+                            // Events
+                            onChangeText = {this.onChangeComments}/>
 
                         {
                             this.state.missingField &&
@@ -644,10 +668,10 @@ const styles = StyleSheet.create({
 
     modalInput: {
         width: '80%',
-        color: blueColor,
+        color: 'white',
         fontSize: 14,
         padding: 10,
-        borderColor: blueColor,
+        borderColor: 'white',
         borderWidth: 1,
         borderRadius: 10,
         marginVertical: 10
@@ -670,10 +694,10 @@ const styles = StyleSheet.create({
 
     smallModalInput: {
         width: '80%',
-        color: blueColor,
+        color: 'white',
         fontSize: 14,
         padding: 10,
-        borderColor: blueColor,
+        borderColor: 'white',
         borderWidth: 1,
         borderRadius: 10,
         marginTop: 10,
@@ -682,9 +706,9 @@ const styles = StyleSheet.create({
 
     customInputContainer: {
         width: '50%',
-        color: blueColor,
+        color: 'white',
         padding: 10,
-        borderColor: blueColor,
+        borderColor: 'white',
         borderWidth: 1,
         borderRadius: 10,
         marginTop: 5,
@@ -797,7 +821,6 @@ const styles = StyleSheet.create({
     },
 
     flatListItemContainer: {
-        marginRight: 10,
         paddingVertical: 10,
         paddingHorizontal: 20,
         borderRadius: 20,

@@ -43,9 +43,11 @@ export default class PersonalEvolutionDetailsPage extends Component {
     weightDiff = (previous, actual) => {
         let weightDiff = actual - previous;
         return(
-            <Text style={[weightDiff < 0 ? styles.negative : styles.positive, {marginLeft: 10}]}>
-                {weightDiff < 0 ? "-" : "+"}
-                {Math.abs(weightDiff)} kg
+            <Text style={[weightDiff < 0 ? styles.negative : weightDiff > 0 ? styles.positive : styles.neutral, {marginLeft: 10, minWidth: 40, textAlign: 'right'}]}>
+                {weightDiff < 0 ? "-" : weightDiff > 0 ? "+" : "-"}
+                {
+                    weightDiff !== 0 && <>{Math.abs(weightDiff)} kg</>
+                }
             </Text>
         )
     }
@@ -167,8 +169,9 @@ export default class PersonalEvolutionDetailsPage extends Component {
                                                     &nbsp;kg
                                                 </Text>
                                                 {
-                                                    i < this.state.data.length - 1 &&
+                                                    i < this.state.data.length - 1 ?
                                                         this.weightDiff(parseInt(this.state.data[i + 1].weight), parseInt(this.state.data[i].weight))
+                                                        : <Text style={{marginLeft: 10, minWidth: 40, textAlign: 'right'}}></Text>
                                                 }
                                             </View>
                                         </View>
@@ -317,6 +320,11 @@ const styles = StyleSheet.create({
 
     negative: {
         color: redColor,
+        fontWeight: 'bold'
+    },
+
+    neutral : {
+        color: 'grey',
         fontWeight: 'bold'
     },
 

@@ -15,12 +15,14 @@ import ExerciseDetail from './pages/ExerciseDetail'
 import GlobalStats from './pages/GlobalStats'
 import Account from './pages/Account'
 import ExerciseDayDetailsPage from './pages/ExerciseDayDetails'
+import PersonalEvolutionDetailsPage from './pages/PersonalEvolutionDetails';
+import WorkoutMain from './pages/WorkoutMain';
 
 // Import des icônes
 import HomeIcon from './assets/home-icon.svg';
 import GlobalStatsIcon from './assets/globalstats-icon.svg';
 import AccountIcon from './assets/user-icon.svg';
-import PersonalEvolutionDetailsPage from './pages/PersonalEvolutionDetails';
+import WorkoutIcon from './assets/workout.svg';
 
 // Colors
 const bgColor = "#3D348B";
@@ -67,7 +69,7 @@ export default function App() {
                   target: route.key,
                   canPreventDefault: true,
                 });
-                setLeftValue(index * 50);
+                setLeftValue(index * 100/3);
                 
                 if (!isFocused && !event.defaultPrevented) {
                   // The `merge: true` option makes sure that the params inside the tab screen are preserved
@@ -92,6 +94,8 @@ export default function App() {
                     return <AccountIcon height={20} style={isFocused ? (appTheme == "Dark" ? darkTheme.tabBarIconActive : styles.tabBarIconActive) : (appTheme == "Dark" ? darkTheme.tabBarIcon : styles.tabBarIcon)} />
                   case "Parameters":
                     return <HomeIcon height={20} style={isFocused ? (appTheme == "Dark" ? darkTheme.tabBarIconActive : styles.tabBarIconActive) : (appTheme == "Dark" ? darkTheme.tabBarIcon : styles.tabBarIcon)} />
+                    case "Workout":
+                    return <WorkoutIcon height={20} style={isFocused ? (appTheme == "Dark" ? darkTheme.tabBarIconActive : styles.tabBarIconActive) : (appTheme == "Dark" ? darkTheme.tabBarIcon : styles.tabBarIcon)} />
                   default:
                     return <Text>undefined</Text>
                 }
@@ -129,6 +133,9 @@ export default function App() {
           tabBar={props => <MyTabBar {...props} />}>
         <Tab.Screen name="GlobalStats">
           {props => (<GlobalStats {...props} userData={userData} appTheme={appTheme}/>)}
+        </Tab.Screen>
+        <Tab.Screen name="Workout">
+          {props => (<WorkoutMain {...props} userData={userData} appTheme={appTheme}/>)}
         </Tab.Screen>
         <Tab.Screen name="Account">
           {props => (<Account {...props} userData={userData} appTheme={appTheme}/>)}
@@ -223,8 +230,7 @@ const styles = StyleSheet.create({
   animationItemContainer: {
     position: 'absolute',
     top: 0,
-    // width: '25%',
-    width: '50%',
+    width: 100/3 + '%',
     height: '100%',
     overflow: 'hidden'
   },

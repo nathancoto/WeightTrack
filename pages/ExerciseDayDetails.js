@@ -80,6 +80,15 @@ export default class ExerciseDayDetailsPage extends Component {
                             )
                         })
                     }
+
+                    {
+                        this.state.dayData.comments !== undefined && this.state.dayData.comments !== null && this.state.dayData.comments.replace(/\s/g, '') !== ""
+                        &&
+                        <View style={{alignSelf: "flex-start", marginHorizontal: "5%", marginTop: 20}}>
+                            <Text style={styles.dataTitle}>Commentaires</Text>
+                            <Text style={styles.text}>{this.state.dayData.comments}</Text>
+                        </View>
+                    }
                 </ScrollView>
 
             </View>

@@ -398,7 +398,7 @@ const styles = StyleSheet.create({
         color: 'white',
         fontSize: 14,
         padding: 10,
-        borderColor: blueColor,
+        borderColor: 'white',
         borderWidth: 1,
         borderRadius: 10,
         marginVertical: 30
