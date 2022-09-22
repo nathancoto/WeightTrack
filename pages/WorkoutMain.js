@@ -72,6 +72,10 @@ export default class WorkoutMain extends Component {
         const workoutListSnapshot = await getDocs(q);
         let workoutListList = workoutListSnapshot.docs.map(doc => doc.data());
 
+        if(workoutListList.length <= 0) {
+            workoutListList = [];
+        }
+
         workoutListList.sort(function(a, b){
             var aa = a.date.split('/').reverse().join(),
                 bb = b.date.split('/').reverse().join();
@@ -80,15 +84,14 @@ export default class WorkoutMain extends Component {
 
         this.setState({
             workoutList: workoutListList,
-            activeData: workoutListList[0].date,
-            currentWorkoutExerciseList: workoutListList.filter(a => a.date == workoutListList[0].date)[0].exerciseList,
+            activeData: workoutListList.length > 0 ? workoutListList[0].date : '',
+            currentWorkoutExerciseList: workoutListList.length > 0 ? workoutListList.filter(a => a.date == workoutListList[0].date)[0].exerciseList : [],
             workoutListLoaded: true
         }, () => {
             if(this.state.workoutListLoaded && this.state.exerciseListLoaded) {
                 this.fillDbIfNeeded();
             }
         });
-
     }
 
     getExerciseList = async() => {
@@ -372,27 +375,20 @@ export default class WorkoutMain extends Component {
                     </>
                     :
                     <View style={styles.noDataContainer}>
-                        <Text style={{marginBottom: 30, color: 'white'}}>Aucune donnée...</Text>
-                        <TouchableOpacity
-                            style={styles.button}
-                            activeOpacity={.7}
-                            onPress={() => {
-                                this.onOpen()
-                            }}>
-                            <Text style={styles.buttonText}>
-                                Ajouter une séance
-                            </Text>
-                        </TouchableOpacity>
+                        <Text style={{marginBottom: 30, color: 'white'}}>Aucune performance enregistrée...</Text>
                     </View>
                 }
 
-                <TouchableOpacity
-                    style={styles.addExerciseWrapper}
-                    activeOpacity={.8}
-                    onPress={() => {this.onOpenEdit()}}>
-                    <EditIcon style={{color: 'white'}} height={12} />
-                    <Text style={styles.addExerciseText}>Editer la séance</Text>
-                </TouchableOpacity>
+                {
+                    this.state.workoutList.length > 0 &&
+                        <TouchableOpacity
+                            style={styles.addExerciseWrapper}
+                            activeOpacity={.8}
+                            onPress={() => {this.onOpenEdit()}}>
+                            <EditIcon style={{color: 'white'}} height={12} />
+                            <Text style={styles.addExerciseText}>Editer la séance</Text>
+                        </TouchableOpacity>
+                }
 
                 <Modalize 
                     ref={this.state.ref}
