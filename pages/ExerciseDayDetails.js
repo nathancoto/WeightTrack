@@ -36,7 +36,8 @@ export default class ExerciseDayDetailsPage extends Component {
 
                 <ScrollView
                     style={{width: '100%'}}
-                    contentContainerStyle={{ flexGrow: 1, alignItems: 'center' }}>
+                    contentContainerStyle={{ flexGrow: 1, alignItems: 'center' }}
+                    showsVerticalScrollIndicator={false}>
                     <Text style={[styles.text, {marginBottom: 30}]}>
                         Nombre de séries :&nbsp;
                         <Text style={styles.bold}>{this.state.dayData.nbSeries}</Text>

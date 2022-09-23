@@ -1,12 +1,16 @@
 import React, {Component} from 'react'
-import {View, StyleSheet, TextInput, Text, TouchableOpacity, FlatList} from 'react-native'
+import {View, StyleSheet, TextInput, Text, TouchableOpacity, FlatList, ScrollView} from 'react-native'
 import { Modalize } from 'react-native-modalize'
 
 import * as G from '../service/global'
 
 import { db } from '../service/Firebase';
 import { collection, getDocs, addDoc, setDoc, deleteDoc, query, where, updateDoc } from 'firebase/firestore/lite';
+
 import ExerciseCard from '../components/exerciseCard';
+
+import FilterIcon from '../assets/filter.svg';
+import Checkbox from 'expo-checkbox';
 
 // Largeur des items
 const size = G.wSC / G.numColumns - 10;
@@ -28,12 +32,12 @@ export default class GlobalStats extends Component {
             inputExerciseName: '',
             userData: typeof props.userData !== "object" ? JSON.parse(props.userData) : props.userData,
             exerciseList: [],
-            ref: React.createRef(null),
             refDelete: React.createRef(null),
-            refEdit: React.createRef(null),
+            refFilter: React.createRef(null),
             errorMessage: false,
             askDelete: '',
             editExercise: '',
+            filterMuscles: []
         }
 
         // Get all data
@@ -41,8 +45,12 @@ export default class GlobalStats extends Component {
     }
 
     onOpen = () => {
-        this.state.ref.current?.open();
+        this.props.navigation.navigate('AddExercise', {exerciseList: this.state.exerciseList, getData: this.getData});
     };
+
+    onOpenFilter = () => {
+        this.state.refFilter.current?.open();
+    }
 
     askDeleteElement = (exerciseName) => {
         this.state.refDelete.current?.open();
@@ -50,7 +58,8 @@ export default class GlobalStats extends Component {
     }
 
     editElement = () => {
-        this.state.refEdit.current?.open();
+        this.props.navigation.navigate('AddExercise', {exerciseList: this.state.exerciseList, getData: this.getData, editExercise: this.state.askDelete});
+        // this.state.refEdit.current?.open();
     }
 
     deleteElement = async() => {
@@ -102,31 +111,6 @@ export default class GlobalStats extends Component {
         this.setState({editExercise: text})
     }
 
-    saveExerciseName = async(exerciseName) => {
-        if(!this.state.exerciseList.find(obj => obj.exerciseName == exerciseName)) {
-            await addDoc(collection(db, "exerciseList"), {
-                exerciseName: exerciseName,
-                mail: this.state.userData.mail
-            }).then(() => {
-                this.state.ref.current?.close();
-                this.setState({
-                    inputSearch: '',
-                    inputExerciseName: '',
-                    errorMessage: false
-                });
-                this.getData();
-            });
-        } else {
-            this.setState({errorMessage: true});
-        }
-
-        // Update data
-        // await setDoc(doc(db, "exerciseList", "key"), {
-        //     exerciseName: exerciseName,
-        //     mail: this.state.userData.mail
-        // });
-    }
-
     editExercise = async() => {
         if(!this.state.exerciseList.find(obj => obj.exerciseName == this.state.editExercise)) {
             const exercisesDataCol = collection(db, 'exercisesData');
@@ -160,7 +144,6 @@ export default class GlobalStats extends Component {
                         inputSearch: '',
                         inputExerciseName: '',
                         askDelete: '',
-                        editElement: '',
                         errorMessage: false
                     });
                     this.getData();
@@ -172,10 +155,49 @@ export default class GlobalStats extends Component {
     }
 
     filterList(list) {
-        return list.filter(listItem => listItem.exerciseName.toLowerCase().includes(this.state.inputSearch.toLowerCase()));
+        if(this.state.filterMuscles.length > 0 && this.state.filterMuscles.some(e => e.checked == true)) {
+            let activeMusclesFilter = [...this.state.filterMuscles];
+            activeMusclesFilter = activeMusclesFilter.filter(el => el.checked == true);
+            activeMusclesFilter = activeMusclesFilter.map(el => el.muscle);
+            return list.filter(listItem => listItem.exerciseName.toLowerCase().includes(this.state.inputSearch.toLowerCase())
+                && listItem.muscles !== null && listItem.muscles !== undefined
+                && activeMusclesFilter.every(el => listItem.muscles.includes(el)));
+        } else {
+            return list.filter(listItem => listItem.exerciseName.toLowerCase().includes(this.state.inputSearch.toLowerCase()));
+        }
+    }
+
+    setFilters = (i) => {
+        let filterMuscles = [...this.state.filterMuscles];
+        if(filterMuscles.some(e => e.muscle == i)) {
+            let newOptions = {...filterMuscles.find(el => el.muscle == i)};
+            newOptions.checked = !newOptions.checked;
+
+            let muscleIndex = filterMuscles.indexOf(filterMuscles.find(el => el.muscle == i));
+            filterMuscles.splice(muscleIndex, 1);
+            filterMuscles.push(newOptions);
+        } else {
+            filterMuscles.push({
+                muscle: i,
+                checked: true
+            });
+        }
+        this.setState({filterMuscles: filterMuscles});
     }
 
     render() {
+        let muscleList = [];
+        this.state.exerciseList.forEach((el) => {
+            if(el.muscles) {
+                el.muscles.map(muscle => {
+                    if(muscleList.indexOf(muscle) === -1) {
+                        muscleList.push(muscle);
+                    }
+                })
+            }
+        })
+        muscleList.sort();
+
         return(
             <View style={[styles.container, this.props.appTheme == "Dark" ? darkTheme.container : null]}>
                 <View style={[styles.inputWrapper, this.props.appTheme == "Dark" ? darkTheme.inputWrapper : null]}>
@@ -191,6 +213,12 @@ export default class GlobalStats extends Component {
                             // Events
                             onChangeText = {this.onChangeSearch}/>
                     </View>
+                    <TouchableOpacity
+                        style={styles.filterContainer}
+                        activeOpacity={.7}
+                        onPress={() => this.onOpenFilter()}>
+                        <FilterIcon style={{color: 'white'}} height={20} />
+                    </TouchableOpacity>
                 </View>
 
                 {
@@ -235,43 +263,6 @@ export default class GlobalStats extends Component {
                 </TouchableOpacity>
 
                 <Modalize 
-                    ref={this.state.ref}
-                    // modalHeight={400}
-                    disableScrollIfPossible={true}
-                    adjustToContentHeight={true}
-                    modalStyle={{backgroundColor: bgColor}}
-                    onClosed={() => this.setState({inputExerciseName: ""})}>
-                    <View style={[styles.modalContent, {paddingBottom: 150}]}>
-                        <Text style={styles.title}>Ajouter un exercice</Text>
-
-                        <TextInput
-                            style={styles.modalInput}
-                            placeholder="Nom de l'exercice"
-                            placeholderTextColor={textColor}
-
-                            // Valeur à afficher par défaut dans le champ de recherche
-                            value={this.state.inputExerciseName}
-
-                            // Events
-                            onChangeText = {this.onChangeExerciseName}/>
-
-                        {this.state.errorMessage && <Text style={styles.errorMessage}>Cet exercice existe déjà</Text>}
-
-                        <TouchableOpacity
-                            style={styles.button}
-                            onPress={() => {
-                                if(this.state.inputExerciseName.replace(/\s/g, '') !== "") {
-                                    this.saveExerciseName(this.state.inputExerciseName)
-                                }
-                            }}
-                            activeOpacity={.7}
-                        >
-                            <Text style={styles.buttonText}>Ajouter</Text>
-                        </TouchableOpacity>
-                    </View>
-                </Modalize>
-
-                <Modalize 
                     ref={this.state.refDelete}
                     // modalHeight={300}
                     adjustToContentHeight={true}
@@ -302,9 +293,8 @@ export default class GlobalStats extends Component {
                     </View>
                 </Modalize>
 
-                <Modalize 
-                    ref={this.state.refEdit}
-                    // modalHeight={300}
+                <Modalize
+                    ref={this.state.refFilter}
                     adjustToContentHeight={true}
                     disableScrollIfPossible={true}
                     modalStyle={{backgroundColor: bgColor}}
@@ -312,31 +302,43 @@ export default class GlobalStats extends Component {
                         this.setState({askDelete: ''});
                         this.state.refDelete.current?.close();
                     }}>
-                    <View style={[styles.modalContent, {paddingBottom: 150}]}>
-                        <TextInput
-                            style={styles.modalInput}
-                            placeholder="Nom de l'exercice"
-                            placeholderTextColor={textColor}
+                    <View style={[styles.modalContent, {paddingVertical: 0}]}>
+                        <ScrollView
+                            contentContainerStyle={{justifyContent: 'center', alignItems: 'center'}}
+                            style={{paddingTop: 60, paddingBottom: 150}}>
+                            <Text style={[styles.title, {marginBottom: 10}]}>Sélectionnez les muscles utilisés</Text>
 
-                            // Valeur à afficher par défaut dans le champ de recherche
-                            value={this.state.editExercise}
+                            {
+                                muscleList.map((el, i) => {
+                                    return(
+                                        <TouchableOpacity
+                                            style={styles.filterItem}
+                                            activeOpacity={1}
+                                            key={i}
+                                            onPress={() => this.setFilters(el)}
+                                        >
+                                            <Checkbox
+                                                style={styles.checkbox}
+                                                value={this.state.filterMuscles.find(a => a.muscle == el) ? this.state.filterMuscles.find(a => a.muscle == el).checked : false}
+                                                onValueChange={() => this.setFilters(el)}
+                                                color={this.state.filterMuscles[el] ? blueColor : blueColor}
+                                            />
+                                            <Text style={styles.filterText}>{el}</Text>
+                                        </TouchableOpacity>
+                                    )
+                                })
+                            }
 
-                            // Events
-                            onChangeText = {this.onChangeEditExercise}/>
-
-                        {this.state.errorMessage && <Text style={styles.errorMessage}>Cet exercice existe déjà</Text>}
-
-                        <TouchableOpacity
-                            style={styles.button}
-                            onPress={() => {
-                                if(this.state.editExercise.replace(/\s/g, '') !== "") {
-                                    this.editExercise()
-                                }
-                            }}
-                            activeOpacity={.7}
-                        >
-                            <Text style={styles.buttonText}>Editer</Text>
-                        </TouchableOpacity>
+                            <TouchableOpacity
+                                style={[styles.button, {marginTop: 20}]}
+                                onPress={() => {
+                                    this.state.refFilter.current?.close();
+                                }}
+                                activeOpacity={.7}
+                            >
+                                <Text style={styles.buttonText}>Filtrer</Text>
+                            </TouchableOpacity>
+                        </ScrollView>
                     </View>
                 </Modalize>
             </View>
@@ -357,15 +359,21 @@ const styles = StyleSheet.create({
     inputWrapper: {
         width: '100%',
         backgroundColor: bgColor,
-        height: 103,
+        height: 123,
         marginBottom: 23,
         paddingTop: 50,
+        paddingBottom: 20,
         paddingHorizontal: 0,
-        zIndex: 9
+        zIndex: 9,
+
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center'
     },
 
     inputContainer: {
-        width: 'auto',
+        width: (G.wSC - (G.wSC * 10/100)) - 73,
         height: 53,
         paddingHorizontal: 20,
         borderRadius: 10,
@@ -386,6 +394,45 @@ const styles = StyleSheet.create({
         height: '100%',
         fontSize: 14,
         color: 'white'
+    },
+
+    filterContainer: {
+        width: 53,
+        height: 53,
+        padding: 10,
+        marginLeft: 20,
+        borderRadius: 10,
+        backgroundColor: modalColor,
+
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+
+        shadowColor: "#fff",
+        shadowOffset: {
+            width: 0,
+            height: 0,
+        },
+        shadowOpacity: 0.1,
+        shadowRadius: 6,
+        elevation: 10
+    },
+
+    filterItem: {
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginVertical: 10,
+        minWidth: '60%'
+    },
+
+    filterText: {
+        color: 'white'
+    },
+
+    checkbox: {
+        marginRight: 10
     },
 
     title: {
@@ -465,7 +512,7 @@ const styles = StyleSheet.create({
         bottom: 110,
         right: 20,
 
-        shadowColor: "#000",
+        shadowColor: "#fff",
         shadowOffset: {
             width: 0,
             height: 0,
@@ -503,7 +550,7 @@ const styles = StyleSheet.create({
 
     errorMessage: {
         marginBottom: 10,
-        color: 'red'
+        color: redColor
     }
 })
 

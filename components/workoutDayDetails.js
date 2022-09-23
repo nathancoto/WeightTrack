@@ -34,7 +34,8 @@ export default class WorkoutDayDetails extends Component {
         return(
             <ScrollView
                 style={styles.container}
-                contentContainerStyle={{alignItems: 'center', justifyContent: 'center'}}>
+                contentContainerStyle={{alignItems: 'center', justifyContent: 'center'}}
+                showsVerticalScrollIndicator={false}>
                 {
                     typeof this.props.dayData == "object" ?
                     <>

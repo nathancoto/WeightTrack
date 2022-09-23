@@ -146,7 +146,8 @@ export default class PersonalEvolutionDetailsPage extends Component {
 
                 <ScrollView
                     style={{width: '100%'}}
-                    contentContainerStyle={{ flexGrow: 1, alignItems: 'center' }}>
+                    contentContainerStyle={{ flexGrow: 1, alignItems: 'center' }}
+                    showsVerticalScrollIndicator={false}>
                     {
                         this.state.data.length >= 0 &&
                         this.state.data.map((a, i) => {
@@ -335,7 +336,7 @@ const styles = StyleSheet.create({
     },
 
     errorMessage: {
-        color: 'red'
+        color: redColor
     },
 
     modalInput: {

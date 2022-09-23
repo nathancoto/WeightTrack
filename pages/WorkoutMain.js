@@ -400,7 +400,8 @@ export default class WorkoutMain extends Component {
                     })}>
                     <ScrollView
                         style={[styles.modalContent, {paddingBottom: 150}]}
-                        contentContainerStyle={{alignItems: 'center', justifyContent: 'center'}}>
+                        contentContainerStyle={{alignItems: 'center', justifyContent: 'center'}}
+                        showsVerticalScrollIndicator={false}>
                         <Text style={styles.modalTitle}>Editer la séance du {this.state.activeData}</Text>
 
                         {
@@ -538,7 +539,7 @@ const styles = StyleSheet.create({
         bottom: 110,
         right: 20,
 
-        shadowColor: "#000",
+        shadowColor: "#fff",
         shadowOffset: {
             width: 0,
             height: 0,

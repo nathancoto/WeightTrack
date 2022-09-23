@@ -408,7 +408,7 @@ const styles = StyleSheet.create({
     },
 
     errorMessage: {
-        color: 'red'
+        color: redColor
     },
 
     modalInput: {

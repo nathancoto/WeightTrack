@@ -10,13 +10,13 @@ import { StatusBar } from 'expo-status-bar';
 // Import des écrans
 import Connexion from './pages/Connexion'
 import CreateAccount from './pages/CreateAccount'
-import AddPerformance from './pages/AddPerformance'
 import ExerciseDetail from './pages/ExerciseDetail'
 import GlobalStats from './pages/GlobalStats'
 import Account from './pages/Account'
 import ExerciseDayDetailsPage from './pages/ExerciseDayDetails'
 import PersonalEvolutionDetailsPage from './pages/PersonalEvolutionDetails';
 import WorkoutMain from './pages/WorkoutMain';
+import AddExercise from './pages/AddExercise';
 
 // Import des icônes
 import HomeIcon from './assets/home-icon.svg';
@@ -154,9 +154,6 @@ export default function App() {
           {props => (<CreateAccount {...props} setUserData={setUserData} setAppTheme={setAppTheme}/>)}
         </Stack.Screen>
         <Stack.Screen name="App" component={HomeTabs} />
-        <Stack.Screen name="AddPerformance">
-          {props => (<AddPerformance {...props} userData={userData} appTheme={appTheme}/>)}
-        </Stack.Screen>
         <Stack.Screen name="ExerciseDetail">
           {props => (<ExerciseDetail {...props} userData={userData} appTheme={appTheme}/>)}
         </Stack.Screen>
@@ -165,6 +162,9 @@ export default function App() {
         </Stack.Screen>
         <Stack.Screen name="PersonalEvolutionDetails">
           {props => (<PersonalEvolutionDetailsPage {...props} userData={userData} appTheme={appTheme}/>)}
+        </Stack.Screen>
+        <Stack.Screen name="AddExercise">
+          {props => (<AddExercise {...props} userData={userData} appTheme={appTheme}/>)}
         </Stack.Screen>
       </Stack.Navigator>
     </NavigationContainer>

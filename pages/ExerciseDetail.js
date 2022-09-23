@@ -427,7 +427,7 @@ export default class ExerciseDetail extends Component {
                     style={{marginVertical: 20, flexGrow: 0, width: G.wSC, paddingHorizontal: 5/100 * G.wSC}}
                 />
 
-                <ScrollView style={{width: '100%'}}>
+                <ScrollView style={{width: '100%'}} showsVerticalScrollIndicator={false}>
                     <ExerciseDayDetails
                         dayData={this.state.dayData}
                         userData={this.state.exercise}
@@ -765,7 +765,7 @@ const styles = StyleSheet.create({
         bottom: 50,
         right: 20,
 
-        shadowColor: "#000",
+        shadowColor: "#fff",
         shadowOffset: {
             width: 0,
             height: 0,
@@ -789,7 +789,7 @@ const styles = StyleSheet.create({
         top: 55,
         right: 30,
 
-        shadowColor: "#000",
+        shadowColor: "#fff",
         shadowOffset: {
             width: 0,
             height: 0,
@@ -858,7 +858,7 @@ const styles = StyleSheet.create({
     },
 
     errorMessage: {
-        color: 'red'
+        color: redColor
     },
 
     deleteButton: {
