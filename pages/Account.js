@@ -148,7 +148,8 @@ export default class Account extends Component {
         }
 
         let dateChecker = this.state.date.split("/");
-        if(dateChecker.length !== 3 || dateChecker[0].length !== 2 || dateChecker[1].length !== 2 || dateChecker[2].length !== 4) {
+        if(dateChecker.length !== 3 || dateChecker[0].length !== 2 || dateChecker[1].length !== 2 || dateChecker[2].length !== 4
+            || !(/^\d+$/.test(dateChecker[0])) || !(/^\d+$/.test(dateChecker[1])) || !(/^\d+$/.test(dateChecker[2]))) {
             missingField = true;
             this.setState({wrongFormat: true});
         }

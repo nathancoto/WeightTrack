@@ -18,6 +18,10 @@ import EditIcon from '../assets/edit.svg';
 import ExpandIcon from '../assets/expand.svg';
 import DeleteIcon from '../assets/delete.svg';
 import PlusIcon from '../assets/plus.svg';
+import AddPerfMachine from '../components/addPerfMachine';
+import AddPerfNormal from '../components/addPerfNormal';
+import AddPerfBar from '../components/addPerfBar';
+import AddPerfCardio from '../components/addPerfCardio';
 
 // Colors
 const bgColor = "#3D348B";
@@ -100,52 +104,46 @@ export default class ExerciseDetail extends Component {
         });
     }
 
-    onChangeNbReps(index) {
-        return (text) => {
-            let repsWeights = this.state.repsWeights;
-            if(typeof repsWeights[index.i] == 'object') {
-                repsWeights[index.i]['nbReps'] = text;
-            } else {
-                repsWeights[index.i] = {
-                    nbReps: text,
-                    weight: '',
-                    recupTime: ''
-                };
-            }
-            this.setState({repsWeights: repsWeights});
+    onChangeNbReps = (index, text) => {
+        let repsWeights = this.state.repsWeights;
+        if(typeof repsWeights[index.i] == 'object') {
+            repsWeights[index.i]['nbReps'] = text;
+        } else {
+            repsWeights[index.i] = {
+                nbReps: text,
+                weight: '',
+                recupTime: ''
+            };
         }
+        this.setState({repsWeights: repsWeights});
     }
 
-    onChangeWeights(index) {
-        return (text) => {
-            let repsWeights = this.state.repsWeights;
-            if(typeof repsWeights[index.i] == 'object') {
-                repsWeights[index.i]['weight'] = text;
-            } else {
-                repsWeights[index.i] = {
-                    nbReps: '',
-                    weight: text,
-                    recupTime: ''
-                };
-            }
-            this.setState({repsWeights: repsWeights});
+    onChangeWeights = (index, text) => {
+        let repsWeights = this.state.repsWeights;
+        if(typeof repsWeights[index.i] == 'object') {
+            repsWeights[index.i]['weight'] = text;
+        } else {
+            repsWeights[index.i] = {
+                nbReps: '',
+                weight: text,
+                recupTime: ''
+            };
         }
+        this.setState({repsWeights: repsWeights});
     }
 
-    onChangeRecupTime(index) {
-        return (text) => {
-            let repsWeights = this.state.repsWeights;
-            if(typeof repsWeights[index.i] == 'object') {
-                repsWeights[index.i]['recupTime'] = text;
-            } else {
-                repsWeights[index.i] = {
-                    nbReps: '',
-                    weight: '',
-                    recupTime: text
-                };
-            }
-            this.setState({repsWeights: repsWeights});
+    onChangeRecupTime = (index, text) => {
+        let repsWeights = this.state.repsWeights;
+        if(typeof repsWeights[index.i] == 'object') {
+            repsWeights[index.i]['recupTime'] = text;
+        } else {
+            repsWeights[index.i] = {
+                nbReps: '',
+                weight: '',
+                recupTime: text
+            };
         }
+        this.setState({repsWeights: repsWeights});
     }
 
     getData = async () => {
@@ -226,7 +224,8 @@ export default class ExerciseDetail extends Component {
         }
 
         let dateChecker = this.state.date.split("/");
-        if(dateChecker.length !== 3 || dateChecker[0].length !== 2 || dateChecker[1].length !== 2 || dateChecker[2].length !== 4) {
+        if(dateChecker.length !== 3 || dateChecker[0].length !== 2 || dateChecker[1].length !== 2 || dateChecker[2].length !== 4
+            || !(/^\d+$/.test(dateChecker[0])) || !(/^\d+$/.test(dateChecker[1])) || !(/^\d+$/.test(dateChecker[2]))) {
             missingField = true;
             this.setState({wrongFormat: true});
         }
@@ -477,118 +476,136 @@ export default class ExerciseDetail extends Component {
                             comments: ''
                         });
                     }}
-                    modalStyle={{backgroundColor: bgColor}}>
-                    <View style={styles.modalContent}>
-                        <Text style={[styles.title, {marginBottom: 20}]}>
-                            {this.state.fill ? "Editer les données du " + this.state.dayData.date : "Ajouter des performances"}
-                        </Text>
+                    modalStyle={{backgroundColor: bgColor}}
+                >
+                    {
+                        this.props.route.params.exercise.category == "gymMachine" ?
+                            <AddPerfMachine
+                                exercise={this.props.route.params.exercise}
+                                onChangeDate={this.onChangeDate}
+                                onChangeNbSeries={this.onChangeNbSeries}
+                                onChangeNbReps={this.onChangeNbReps}
+                                onChangeWeights={this.onChangeWeights}
+                                onChangeRecupTime={this.onChangeRecupTime}
+                                onChangeComments={this.onChangeComments}
+                                saveData={this.saveData}
 
-                        <TextInput
-                            style={styles.modalInput}
-                            defaultValue={this.state.fill == true ? this.state.dayData.date : formattedToday}
+                                fill={this.state.fill}
+                                nbSeries={this.state.nbSeries}
+                                repsWeights={this.state.repsWeights}
+                                date={this.state.date}
+                                comments={this.state.comments}
+                                dayData={this.state.dayData}
+                            />
+                        : this.props.route.params.exercise.category == "haltere" ?
+                            <AddPerfNormal
+                                exercise={this.props.route.params.exercise}
+                                onChangeDate={this.onChangeDate}
+                                onChangeNbSeries={this.onChangeNbSeries}
+                                onChangeNbReps={this.onChangeNbReps}
+                                onChangeWeights={this.onChangeWeights}
+                                onChangeRecupTime={this.onChangeRecupTime}
+                                onChangeComments={this.onChangeComments}
+                                saveData={this.saveData}
 
-                            // Events
-                            onChangeText = {this.onChangeDate}/>
+                                fill={this.state.fill}
+                                nbSeries={this.state.nbSeries}
+                                repsWeights={this.state.repsWeights}
+                                date={this.state.date}
+                                comments={this.state.comments}
+                                dayData={this.state.dayData}
+                            />
+                        : this.props.route.params.exercise.category == "bar" ?
+                            <AddPerfBar
+                                exercise={this.props.route.params.exercise}
+                                onChangeDate={this.onChangeDate}
+                                onChangeNbSeries={this.onChangeNbSeries}
+                                onChangeNbReps={this.onChangeNbReps}
+                                onChangeWeights={this.onChangeWeights}
+                                onChangeRecupTime={this.onChangeRecupTime}
+                                onChangeComments={this.onChangeComments}
+                                saveData={this.saveData}
 
-                        <TextInput
-                            style={[styles.modalInput, {marginBottom: 20}]}
-                            placeholder="Nombre de séries"
-                            placeholderTextColor={'#96C9DC'}
-                            keyboardType={'number-pad'}
-                            defaultValue={this.state.fill == true ? this.state.dayData.nbSeries : null}
+                                fill={this.state.fill}
+                                nbSeries={this.state.nbSeries}
+                                repsWeights={this.state.repsWeights}
+                                date={this.state.date}
+                                comments={this.state.comments}
+                                dayData={this.state.dayData}
+                            />
+                        : this.props.route.params.exercise.category == "kettlebell" ?
+                            <AddPerfNormal
+                                exercise={this.props.route.params.exercise}
+                                onChangeDate={this.onChangeDate}
+                                onChangeNbSeries={this.onChangeNbSeries}
+                                onChangeNbReps={this.onChangeNbReps}
+                                onChangeWeights={this.onChangeWeights}
+                                onChangeRecupTime={this.onChangeRecupTime}
+                                onChangeComments={this.onChangeComments}
+                                saveData={this.saveData}
 
-                            // Events
-                            onChangeText = {this.onChangeNbSeries}/>
+                                fill={this.state.fill}
+                                nbSeries={this.state.nbSeries}
+                                repsWeights={this.state.repsWeights}
+                                date={this.state.date}
+                                comments={this.state.comments}
+                                dayData={this.state.dayData}
+                            />
+                        : this.props.route.params.exercise.category == "poulie" ?
+                            <AddPerfNormal
+                                exercise={this.props.route.params.exercise}
+                                onChangeDate={this.onChangeDate}
+                                onChangeNbSeries={this.onChangeNbSeries}
+                                onChangeNbReps={this.onChangeNbReps}
+                                onChangeWeights={this.onChangeWeights}
+                                onChangeRecupTime={this.onChangeRecupTime}
+                                onChangeComments={this.onChangeComments}
+                                saveData={this.saveData}
 
-                        {
-                            parseInt(this.state.nbSeries) >= 0 &&
-                            Array.from(Array(parseInt(this.state.nbSeries)).keys()).map((a, i) => {
-                                return(
-                                    <View style={styles.dataInputContainer} key={i}>
-                                        <View style={styles.row}>
-                                            <Text style={styles.dataTitle}>Série {i+1}</Text>
-                                        </View>
-                                        <View style={styles.row}>
-                                            <View style={styles.column}>
-                                                <Text style={styles.dataLabel}>Nombre de répétitions</Text>
-                                                <TextInput
-                                                    style={styles.smallModalInput}
-                                                    keyboardType={'number-pad'}
-                                                    defaultValue={this.state.fill == true ? this.state.dayData.repsWeights[i].nbReps : null}
+                                fill={this.state.fill}
+                                nbSeries={this.state.nbSeries}
+                                repsWeights={this.state.repsWeights}
+                                date={this.state.date}
+                                comments={this.state.comments}
+                                dayData={this.state.dayData}
+                            />
+                        : this.props.route.params.exercise.category == "cardio" ?
+                            <AddPerfCardio
+                                exercise={this.props.route.params.exercise}
+                                onChangeDate={this.onChangeDate}
+                                onChangeNbSeries={this.onChangeNbSeries}
+                                onChangeNbReps={this.onChangeNbReps}
+                                onChangeWeights={this.onChangeWeights}
+                                onChangeRecupTime={this.onChangeRecupTime}
+                                onChangeComments={this.onChangeComments}
+                                saveData={this.saveData}
 
-                                                    // Events
-                                                    onChangeText = {this.onChangeNbReps({i})}/>
-                                            </View>
-                                            <View style={[styles.column, styles.right]}>
-                                                <Text style={[styles.dataLabel]}>Poids</Text>
-                                                <TextInput
-                                                    style={styles.smallModalInput}
-                                                    keyboardType={'decimal-pad'}
-                                                    defaultValue={this.state.fill == true ? this.state.dayData.repsWeights[i].weight : null}
+                                fill={this.state.fill}
+                                nbSeries={this.state.nbSeries}
+                                repsWeights={this.state.repsWeights}
+                                date={this.state.date}
+                                comments={this.state.comments}
+                                dayData={this.state.dayData}
+                            />
+                        :
+                            <AddPerfNormal
+                                exercise={this.props.route.params.exercise}
+                                onChangeDate={this.onChangeDate}
+                                onChangeNbSeries={this.onChangeNbSeries}
+                                onChangeNbReps={this.onChangeNbReps}
+                                onChangeWeights={this.onChangeWeights}
+                                onChangeRecupTime={this.onChangeRecupTime}
+                                onChangeComments={this.onChangeComments}
+                                saveData={this.saveData}
 
-                                                    // Events
-                                                    onChangeText = {this.onChangeWeights({i})}/>
-                                            </View>
-                                        </View>
-                                        {
-                                            i + 1 < this.state.nbSeries ?
-                                            <TouchableOpacity
-                                                style={styles.customInputContainer}
-                                                onPress={() => { this.state.timeInput[i].focus(); }}>
-                                                <TimeIcon style={{color: 'white'}} height={12} />
-                                                <TextInput
-                                                    style={[styles.customInput, {color: 'white'}]}
-                                                    keyboardType={'decimal-pad'}
-                                                    ref={(input) => { this.state.timeInput[i] = input; }}
-                                                    defaultValue={this.state.fill == true ? this.state.dayData.repsWeights[i].recupTime : "0"}
-        
-                                                    // Events
-                                                    onChangeText = {this.onChangeRecupTime({i})}/>
-                                                <Text style={{color: 'white'}}> secondes</Text>
-                                             </TouchableOpacity>   
-                                            : null
-                                        }
-                                    </View>
-                                )
-                            })
-                        }
-
-                        <Text style={[styles.dataLabel, {alignSelf: 'flex-start', marginLeft: '10%'}]}>Commentaires</Text>
-                        <TextInput
-                            style={[styles.modalInput, {marginBottom: 20, textAlignVertical: "top"}]}
-                            placeholder="Commentaires"
-                            placeholderTextColor={'#96C9DC'}
-                            defaultValue={this.state.fill == true ? this.state.dayData.comments : null}
-                            multiline={true}
-
-                            // Events
-                            onChangeText = {this.onChangeComments}/>
-
-                        {
-                            this.state.missingField &&
-                                <Text style={styles.errorMessage}>Un ou plusieurs champs sont manquants</Text>
-                        }
-
-                        {
-                            this.state.existingDate &&
-                                <Text style={styles.errorMessage}>Cette date contient déjà des données</Text>
-                        }
-
-                        {
-                            this.state.wrongFormat &&
-                                <Text style={styles.errorMessage}>La date doit être au format dd/mm/yyyy</Text>
-                        }
-
-                        <TouchableOpacity
-                            style={[styles.button, {marginTop: 20}]}
-                            onPress={() => {
-                                this.saveData()
-                            }}
-                            activeOpacity={.7}
-                        >
-                            <Text style={styles.buttonText}>{this.state.fill ? "Editer" : "Ajouter"}</Text>
-                        </TouchableOpacity>
-                    </View>
+                                fill={this.state.fill}
+                                nbSeries={this.state.nbSeries}
+                                repsWeights={this.state.repsWeights}
+                                date={this.state.date}
+                                comments={this.state.comments}
+                                dayData={this.state.dayData}
+                            />
+                    }
                 </Modalize>
 
                 <Modalize 
@@ -611,14 +628,6 @@ export default class ExerciseDetail extends Component {
                         </TouchableOpacity>
                     </View>
                 </Modalize>
-
-                {/* <TouchableOpacity
-                    style={styles.addPerformanceWrapper}
-                    activeOpacity={.8}
-                    onPress={() => {this.onOpen()}}>
-                    <Text style={styles.addPerformancePlus}>+</Text>
-                    <Text style={styles.addPerformanceText}>Ajouter des performances</Text>
-                </TouchableOpacity> */}
             </View>
         )
     }

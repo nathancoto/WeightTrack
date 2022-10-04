@@ -360,7 +360,7 @@ const styles = StyleSheet.create({
         width: '100%',
         backgroundColor: bgColor,
         height: 123,
-        marginBottom: 23,
+        // marginBottom: 23,
         paddingTop: 50,
         paddingBottom: 20,
         paddingHorizontal: 0,
